@@ -1,0 +1,9 @@
+# Production dependencies for cert-checker
+cryptography>=41.0.0
+pyOpenSSL>=23.0.0
+toml>=0.10.2
+click>=8.1.0
+textual>=0.47.0
+rich>=13.7.0
+pydantic>=2.5.0
+pyjks>=20.0.0
