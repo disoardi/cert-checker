@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(poetry:*)",
+      "Bash(source .venv/bin/activate)",
+      "Bash(pip install:*)",
+      "Bash(cert-checker:*)",
+      "Bash(openssl req:*)",
+      "Bash(python:*)",
+      "Bash(.gitignore:*)"
+    ]
+  }
+}

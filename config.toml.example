@@ -1,0 +1,102 @@
+# cert-checker Configuration Example
+# Copy this file to config.toml and customize for your environment
+
+# Global Settings
+[settings]
+# Connection timeout in seconds
+timeout = 10
+
+# Whether to verify certificate chains
+verify_chain = true
+
+# Show warning messages
+show_warnings = true
+
+# Default port for hosts without explicit port
+default_port = 443
+
+
+# Truststore and Keystore Configuration
+[stores]
+# Path to truststore containing trusted CA certificates
+# Supports: JKS, PKCS12, or PEM directory
+truststore = "/path/to/truststore.jks"
+
+# Truststore password (supports environment variables)
+# Use ${ENV_VAR} syntax to reference environment variables
+truststore_password = "${TRUSTSTORE_PASSWORD}"
+
+# Path to keystore containing client certificates and private keys
+keystore = "/path/to/keystore.p12"
+
+# Keystore password
+keystore_password = "${KEYSTORE_PASSWORD}"
+
+
+# Hosts to Monitor
+# Define multiple [[hosts]] sections for each host you want to monitor
+
+[[hosts]]
+# Friendly name for the host
+name = "Production API"
+
+# Fully qualified domain name
+fqdn = "api.example.com"
+
+# Port number (default: 443)
+port = 443
+
+# Whether this host is enabled for checking
+enabled = true
+
+# Number of days before expiration to trigger warning
+warning_days = 30
+
+# Whether to use client certificate from keystore
+client_cert = false
+
+
+[[hosts]]
+name = "Internal Service"
+fqdn = "internal.company.local"
+port = 8443
+enabled = true
+warning_days = 30
+client_cert = false
+
+
+[[hosts]]
+name = "Database Server"
+fqdn = "db.example.com"
+port = 5432
+enabled = true
+warning_days = 15
+client_cert = true
+
+
+[[hosts]]
+name = "LDAP Server"
+fqdn = "ldap.example.com"
+port = 636
+enabled = true
+warning_days = 30
+client_cert = false
+
+
+[[hosts]]
+name = "Mail Server"
+fqdn = "mail.example.com"
+port = 993
+enabled = true
+warning_days = 30
+client_cert = false
+
+
+# Example: Disabled host (won't be checked)
+[[hosts]]
+name = "Old Legacy System"
+fqdn = "legacy.example.com"
+port = 443
+enabled = false
+warning_days = 30
+client_cert = false

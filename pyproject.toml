@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "cert-checker"
+version = "0.1.0"
+description = "Swiss Army knife for SSL/TLS certificate management and verification"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+license = "MIT"
+packages = [{include = "cert_checker"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+cryptography = ">=41.0.0"
+pyOpenSSL = ">=23.0.0"
+toml = ">=0.10.2"
+click = ">=8.1.0"
+textual = ">=0.47.0"
+rich = ">=13.7.0"
+pydantic = ">=2.5.0"
+pyjks = ">=20.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+black = "^23.12.0"
+flake8 = "^6.1.0"
+mypy = "^1.7.0"
+pyinstaller = "^6.3.0"
+
+[tool.poetry.scripts]
+cert-checker = "cert_checker.__main__:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=cert_checker --cov-report=term-missing"

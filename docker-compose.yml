@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  cert-checker:
+    build: .
+    image: cert-checker:latest
+    container_name: cert-checker
+    volumes:
+      # Mount configuration directory
+      - ./config:/config
+      # Mount certificates directory
+      - ./certs:/certs
+    environment:
+      # Environment variables for passwords
+      - TRUSTSTORE_PASSWORD=${TRUSTSTORE_PASSWORD:-changeit}
+      - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD:-changeit}
+    command: check --config /config/config.toml
+
+  # Example: Run specific commands
+  cert-checker-list:
+    build: .
+    image: cert-checker:latest
+    volumes:
+      - ./certs:/certs
+    command: truststore list --store /certs/truststore.jks --password changeit
+    profiles:
+      - manual
+
+  cert-checker-tui:
+    build: .
+    image: cert-checker:latest
+    volumes:
+      - ./config:/config
+      - ./certs:/certs
+    stdin_open: true
+    tty: true
+    command: tui --config /config/config.toml
+    profiles:
+      - manual
