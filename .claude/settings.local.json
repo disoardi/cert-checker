@@ -11,7 +11,16 @@
       "Bash(.gitignore:*)",
       "Bash(gh repo view:*)",
       "Bash(gh repo create:*)",
-      "Bash(mkdocs.yml:*)"
+      "Bash(mkdocs.yml:*)",
+      "Bash(gh api:*)",
+      "Bash(cat:*)",
+      "Bash(DEPLOYMENT-SUMMARY.md:*)",
+      "Bash(__NEW_LINE_be3845603a62b6e7__ git add DEPLOYMENT-SUMMARY.md)",
+      "Bash(__NEW_LINE_be3845603a62b6e7__ echo \"✅ Deployment summary created and pushed\")",
+      "Bash(docker build:*)",
+      "Bash(requirements.txt:*)",
+      "Bash(docker-compose build:*)",
+      "Bash(docker-compose run:*)"
     ]
   }
 }

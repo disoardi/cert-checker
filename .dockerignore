@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+test-certs/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+docs/
+.claude/
+*.md
+!README.md
+
+# CI/CD
+.github/
+
+# Development
+.DS_Store
+Thumbs.db
+*.log
+
+# Project specific
+config.toml
+!config.toml.example
+*.jks
+*.p12
+config/
+certs/

@@ -731,6 +731,274 @@ config.toml.example      - Configuration template
 
 ---
 
+## 🐳 Docker Best Practices
+
+### Common Docker Build Issues
+
+#### Java Installation Failures
+- ❌ **DON'T**: Use version-specific packages (`openjdk-17-jre-headless`)
+- ✅ **DO**: Use generic packages (`default-jre-headless`)
+- **Reason**: Specific versions might not be available in all base images
+
+**Example:**
+```dockerfile
+# ❌ BAD - may not exist
+RUN apt-get install -y openjdk-17-jre-headless
+
+# ✅ GOOD - works everywhere
+RUN apt-get install -y default-jre-headless
+```
+
+#### Poetry in Docker
+- ❌ **DON'T**: Use Poetry for production Docker builds
+- ✅ **DO**: Use pip + requirements.txt
+- **Reason**: Avoids dependency resolution conflicts, faster builds, simpler
+
+**Example:**
+```dockerfile
+# ✅ GOOD - Simple and reliable
+COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+```
+
+#### Multi-Stage Builds
+- ✅ Stage 1: Build dependencies with build-essential
+- ✅ Stage 2: Runtime only with minimal packages
+- **Benefit**: Smaller image size, better security
+
+**Example:**
+```dockerfile
+# Stage 1: Builder
+FROM python:3.11-slim AS builder
+RUN apt-get update && apt-get install -y build-essential
+COPY requirements.txt .
+RUN pip install --user -r requirements.txt
+
+# Stage 2: Runtime
+FROM python:3.11-slim
+COPY --from=builder /root/.local /root/.local
+ENV PATH=/root/.local/bin:$PATH
+```
+
+---
+
+## 🧪 Testing Best Practices
+
+### Clean Test Environment Workflow
+
+**Always start with a clean environment:**
+
+```bash
+# 1. Remove old venv
+rm -rf .venv
+
+# 2. Fresh install
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+
+# 3. Verify installation
+cert-checker --version
+cert-checker --help
+
+# 4. Run test suite
+./scripts/quick-test.sh
+
+# 5. Test specific features
+cert-checker check --host google.com --port 443
+```
+
+**Why**: Ensures no cached dependencies or old configs affect test results
+
+### Test Checklist Before Release
+
+- [ ] Clean venv install works
+- [ ] All CLI commands functional
+- [ ] Docker build succeeds
+- [ ] docker-compose runs
+- [ ] Documentation builds (mkdocs build)
+- [ ] GitHub Actions pass
+- [ ] Quick test script passes
+
+---
+
+## 🐛 Common Bug Patterns & Solutions
+
+### Pattern 1: "Object has no attribute" Errors
+
+**Example**: `'SSLSocket' object has no attribute 'getpeercert_bin'`
+
+**Diagnosis Steps:**
+1. Check if method exists in official Python docs
+2. Verify Python version compatibility
+3. Look for renamed/deprecated methods in changelog
+
+**Solution Pattern:**
+- Search official documentation for correct method name
+- Use `dir(object)` in Python REPL to list available methods
+- Check library changelog for API changes
+- Use IDE/LSP autocomplete to verify method exists
+
+**Real Example from This Project:**
+```python
+# ❌ WRONG - method doesn't exist
+der_cert = ssock.getpeercert_bin()
+
+# ✅ CORRECT - official API
+der_cert = ssock.getpeercert(binary_form=True)
+```
+
+### Pattern 2: Bytes vs String Confusion
+
+**Example**: `'bytes' object has no attribute 'encode'`
+
+**Diagnosis Steps:**
+1. Check library API expectations (string vs bytes)
+2. Trace where encoding/decoding happens
+3. Verify type at each conversion point
+
+**Solution Pattern:**
+- Read library source code for expected type
+- Add type hints to catch mismatches early
+- Test with both string and bytes inputs
+- Don't assume - verify API requirements
+
+**Real Example from This Project:**
+```python
+# ❌ WRONG - jks library expects string
+pwd = password.encode("utf-8")
+keystore = jks.KeyStore.load(path, pwd)  # ERROR!
+
+# ✅ CORRECT - pass string directly
+pwd = password  # jks library handles encoding internally
+keystore = jks.KeyStore.load(path, pwd)
+```
+
+### Pattern 3: Package Manager Conflicts
+
+**Example**: Poetry dependency resolution fails, pip works fine
+
+**When It Happens:**
+- Poetry encounters new metadata versions
+- Dev dependencies conflict with production deps
+- Cross-platform dependency issues
+
+**Solution Strategy:**
+1. For development: Use Poetry normally
+2. For Docker/CI: Export to requirements.txt, use pip
+3. For quick tests: Skip Poetry, use pip directly
+
+```bash
+# Development
+poetry install
+poetry shell
+
+# Docker/Production
+pip install -r requirements.txt
+
+# Quick test
+pip install -e .
+```
+
+---
+
+## 📚 GitHub Pages Setup Guide (MkDocs)
+
+### Quick Setup from Scratch
+
+#### 1. Create MkDocs Structure
+
+```bash
+# Install MkDocs
+pip install mkdocs-material mkdocstrings
+
+# Create structure
+mkdir docs
+touch mkdocs.yml
+```
+
+#### 2. Configure mkdocs.yml
+
+```yaml
+site_name: Project Name
+site_url: https://username.github.io/repo
+repo_url: https://github.com/username/repo
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
+  - Quick Start: quickstart.md
+  - CLI Reference: cli-reference.md
+```
+
+#### 3. Create GitHub Actions Workflow
+
+```yaml
+# .github/workflows/docs.yml
+name: Documentation
+
+on:
+  push:
+    branches: [main]
+    paths: ['docs/**', 'mkdocs.yml', '*.md']
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: pip install mkdocs-material mkdocstrings
+      - run: mkdocs gh-deploy --force
+```
+
+#### 4. Enable GitHub Pages (Automated)
+
+```bash
+# Via GitHub API
+curl -X POST \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Accept: application/vnd.github+json" \
+  https://api.github.com/repos/USERNAME/REPO/pages \
+  -d '{"source":{"branch":"gh-pages","path":"/"}}'
+```
+
+#### 5. Verify Deployment
+
+```bash
+# Wait 30-60 seconds, then check
+curl -sI https://username.github.io/repo/ | head -1
+# Should return: HTTP/2 200
+```
+
+### Auto-Update Documentation
+
+Documentation updates automatically when you:
+1. Edit files in `docs/`
+2. Modify `mkdocs.yml`
+3. Update `*.md` files in root
+4. Push to main branch
+
+GitHub Actions builds and deploys in ~30-60 seconds.
+
+---
+
 ## 📞 Support
 
 For help with cert-checker:
@@ -740,11 +1008,29 @@ For help with cert-checker:
 3. **Testing** - See `TESTING.md` for test procedures
 4. **Troubleshooting** - See "Troubleshooting" section above
 5. **Test Cases** - See `TEST-CASES.md` for validation
+6. **Session History** - See `.claude/sessions/` for past work context
+
+---
+
+## 🔧 Utility Scripts
+
+### Docker Validator
+
+Check for common Docker issues:
+```bash
+./scripts/docker-validator.sh
+```
+
+Validates:
+- Version-specific packages (suggests alternatives)
+- Poetry in production builds
+- Multi-stage build usage
+- Common pitfalls
 
 ---
 
 **Last Updated:** 2026-02-16
-**Version:** 1.0
+**Version:** 1.1
 **Status:** Production Ready ✅
 **Completion:** 100% ✅
 
