@@ -1,0 +1,100 @@
+site_name: cert-checker Documentation
+site_url: https://disoardi.github.io/cert-checker
+site_author: disoardi
+site_description: Swiss Army knife for SSL/TLS certificate management and verification
+
+repo_name: disoardi/cert-checker
+repo_url: https://github.com/disoardi/cert-checker
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Quick Start: quickstart.md
+    - Installation: installation.md
+    - Configuration: configuration.md
+  - User Guide:
+    - CLI Commands: cli-reference.md
+    - Remote Checking: guide/remote-checking.md
+    - Truststore Management: guide/truststore.md
+    - Keystore Management: guide/keystore.md
+    - Certificate Validation: guide/validation.md
+    - Format Conversion: guide/conversion.md
+    - TUI Interface: guide/tui.md
+  - Testing:
+    - Testing Guide: testing.md
+    - Test Cases: test-cases.md
+  - Development:
+    - Project Structure: development/structure.md
+    - Contributing: development/contributing.md
+    - Architecture: development/architecture.md
+  - API Reference:
+    - cert_checker.checker: api/checker.md
+    - cert_checker.store: api/store.md
+    - cert_checker.utils: api/utils.md
+  - About:
+    - Project Summary: project-summary.md
+    - License: license.md
+    - Changelog: changelog.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/disoardi/cert-checker
+  version:
+    provider: mike

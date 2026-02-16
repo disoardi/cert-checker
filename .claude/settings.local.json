@@ -8,7 +8,10 @@
       "Bash(cert-checker:*)",
       "Bash(openssl req:*)",
       "Bash(python:*)",
-      "Bash(.gitignore:*)"
+      "Bash(.gitignore:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh repo create:*)",
+      "Bash(mkdocs.yml:*)"
     ]
   }
 }
